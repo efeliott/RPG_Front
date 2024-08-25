@@ -1,85 +1,146 @@
-// src/components/auth/Signup.tsx
-
-import React, { useState } from 'react';
-import axiosInstance from '../../api/axios';
+import * as React from 'react';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Link from '@mui/material/Link';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import axiosInstance from '../../api/axios'; // Assure-toi d'importer correctement ton instance axios
 import { useNavigate } from 'react-router-dom';
-import '../../styles/auth/AuthForm.css';
 
-const Signup: React.FC = () => {
-    const [username, setUsername] = useState<string>('');
-    const [email, setEmail] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [confirmPassword, setConfirmPassword] = useState<string>('');
-    const navigate = useNavigate();
+function Copyright(props: { sx: object }) {
+  return (
+    <Typography variant="body2" color="text.secondary" align="center" {...props}>
+      {'Copyright © '}
+      <Link color="inherit" href="https://mui.com/">
+        Your Website
+      </Link>{' '}
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
+  );
+}
 
-    const handleSignup = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (password !== confirmPassword) {
-            alert('Les mots de passe ne correspondent pas');
-            return;
-        }
-        try {
-            const response = await axiosInstance.post('/register', {
-                username,
-                email,
-                password,
-                password_confirmation: confirmPassword,
-            });
-            console.log(response.data);
-            navigate('/login');
-        } catch (error) {
-            console.error('Erreur d\'inscription', error);
-        }
-    };
+const defaultTheme = createTheme();
 
-    return (
-        <form onSubmit={handleSignup} className="auth-form">
-            <h2 className="auth-form-title">S'inscrire</h2>
-            <div className="auth-form-group">
-                <label className="auth-form-label">Nom d'utilisateur:</label>
-                <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                    className="auth-form-input"
-                />
-            </div>
-            <div className="auth-form-group">
-                <label className="auth-form-label">Email:</label>
-                <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="auth-form-input"
-                />
-            </div>
-            <div className="auth-form-group">
-                <label className="auth-form-label">Mot de passe:</label>
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="auth-form-input"
-                />
-            </div>
-            <div className="auth-form-group">
-                <label className="auth-form-label">Confirmer le mot de passe:</label>
-                <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    className="auth-form-input"
-                />
-            </div>
-            <button type="submit" className="auth-form-button">
-                S'inscrire
-            </button>
-        </form>
-    );
-};
+export default function SignUp() {
+  const navigate = useNavigate();
 
-export default Signup;
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    
+    try {
+      const response = await axiosInstance.post('/register', {
+        username: data.get('username') as string,
+        email: data.get('email') as string,
+        password: data.get('password') as string,
+        password_confirmation: data.get('password_confirmation') as string,
+      });
+
+      console.log(response.data);
+      navigate('/login');
+    } catch (error) {
+      console.error('Erreur d\'inscription', error);
+    }
+  };
+
+  return (
+    <ThemeProvider theme={defaultTheme}>
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Box
+          sx={{
+            marginTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Sign up
+          </Typography>
+          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="username"
+                  label="Username"
+                  name="username"
+                  autoComplete="username"
+                  autoFocus
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="new-password"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="password_confirmation"
+                  label="Confirm Password"
+                  type="password"
+                  id="password_confirmation"
+                  autoComplete="new-password"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={<Checkbox value="allowExtraEmails" color="primary" />}
+                  label="I want to receive inspiration, marketing promotions and updates via email."
+                />
+              </Grid>
+            </Grid>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Sign Up
+            </Button>
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                <Link href="/login" variant="body2">
+                  Already have an account? Sign in
+                </Link>
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
+        <Copyright sx={{ mt: 5 }} />
+      </Container>
+    </ThemeProvider>
+  );
+}
