@@ -10,8 +10,8 @@ import './styles/pages/AuthPage.css';
 import './styles/pages/Dashboard.css';
 
 ReactDOM.render(
-    <AuthProvider>
-      <App />
-    </AuthProvider>,
-    document.getElementById('root')
+  <AuthProvider>
+    <App />
+  </AuthProvider>,
+  document.getElementById('root')
 );

@@ -2,23 +2,26 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './auth/Login';
-import Signup from './auth/Signup';
+import SignIn from './auth/SignIn';
+import SignUp from './auth/SignUp'
 import Dashboard from './pages/Dashboard';
+import AuthPage from './pages/AuthPage';
+import { AuthProvider } from '../context/AuthContext';
 
 const App: React.FC = () => {
     return (
-        <Router>
-            <div className="bg-gray-100 min-h-screen">
+        <AuthProvider>
+            <Router>
                 <Routes>
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/" element={<AuthPage />} />
+                    <Route path="/signin" element={<SignIn />} />
+                    <Route path="/signup" element={<SignUp />} />
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/" element={<h1 className="text-center mt-10">Bienvenue sur la page d'accueil</h1>} />
+                    {/* Ajoute ici d'autres routes si nécessaire */}
                 </Routes>
-            </div>
-        </Router>
+            </Router>
+        </AuthProvider>
     );
 };
-
-export default App;
+  
+  export default App;

@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Route, Routes, Link } from 'react-router-dom';
-import Login from '../auth/Login';
-import Signup from '../auth/Signup';
+import Login from '../auth/SignIn';
+import Signup from '../auth/SignUp';
 import '../../styles/pages/AuthPage.css';
 
 const AuthPage: React.FC = () => {
