@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axiosInstance from '../../api/axios'; // Assurez-vous que cette instance Axios est configurée correctement pour appeler votre API
+import axiosInstance from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext'; // Utiliser le contexte Auth pour stocker le token
+import { useAuth } from '../../context/AuthContext';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -19,30 +19,27 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 const defaultTheme = createTheme();
 
 const SignIn: React.FC = () => {
-  const [email, setEmail] = useState<string>('');  // Stocke l'email
-  const [password, setPassword] = useState<string>('');  // Stocke le mot de passe
-  const [errorMessage, setErrorMessage] = useState<string>(''); // Message d'erreur potentiel
-  const { setToken } = useAuth();  // Utiliser le contexte pour stocker le token
+  const [email, setEmail] = useState<string>('');  
+  const [password, setPassword] = useState<string>('');  
+  const [errorMessage, setErrorMessage] = useState<string>(''); 
+  const { setToken } = useAuth(); 
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => { // Utiliser React.FormEvent
     e.preventDefault();
-    setErrorMessage('');  // Réinitialise les erreurs avant de lancer une nouvelle tentative de connexion
-    console.log("Login triggered");
+    setErrorMessage('');  
 
     try {
-      // Appel à l'API pour authentification
       const response = await axiosInstance.post('/login', {
         email,
         password,
       });
 
-      // Vérifie si l'API renvoie bien un token
       if (response.data && response.data.access_token) {
-        setToken(response.data.access_token);  // Stocker le token dans le contexte
-        navigate('/dashboard');  // Rediriger vers le tableau de bord
+        setToken(response.data.access_token);  
+        navigate('/dashboard'); 
       } else {
-        setErrorMessage('Erreur: Le token d\'authentification est introuvable');
+        setErrorMessage("Erreur: Le token d'authentification est introuvable.");
       }
     } catch (error) {
       console.error('Erreur de connexion', error);
@@ -79,7 +76,7 @@ const SignIn: React.FC = () => {
               autoComplete="email"
               autoFocus
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)} 
             />
             <TextField
               margin="normal"
@@ -91,7 +88,7 @@ const SignIn: React.FC = () => {
               id="password"
               autoComplete="current-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} 
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}

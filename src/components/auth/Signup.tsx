@@ -46,7 +46,7 @@ export default function SignUp() {
       });
 
       console.log(response.data);
-      navigate('/login');
+      navigate('/signup');
     } catch (error) {
       console.error('Erreur d\'inscription', error);
     }

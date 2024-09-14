@@ -1,5 +1,3 @@
-// src/context/AuthContext.tsx
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface AuthContextType {
@@ -9,12 +7,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }): JSX.Element => {
   const [token, setToken] = useState<string | null>(null);
 
   return (
     <AuthContext.Provider value={{ token, setToken }}>
-      {children}
+      {children || null} {/* On s'assure que `children` n'est pas `undefined` */}
     </AuthContext.Provider>
   );
 };

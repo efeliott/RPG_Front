@@ -4,7 +4,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './components/App';
 import { AuthProvider } from './context/AuthContext';
-import './index.css';
 import './styles/auth/AuthForm.css';
 import './styles/pages/AuthPage.css';
 import './styles/pages/Dashboard.css';
