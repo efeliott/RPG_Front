@@ -1,30 +1,45 @@
 // src/components/pages/Dashboard.tsx
 
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import { DataGrid, GridColDef, GridRowParams } from '@mui/x-data-grid';
 import axiosInstance from '../../api/axios';
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import SessionsDataGrid from '../Sessions/SessionsDataGrid';
 
 interface SessionData {
-  id: number;
+  session_id: number;
   title: string;
   description: string;
   token: string;
+  game_master_id: number;
+  is_active: number;
+  created_at: string;
+  updated_at: string;
 }
 
-export default function GameMasterSessionsDataGrid() {
-  const [sessions, setSessions] = useState<SessionData[]>([]);
+interface APIResponse {
+  game_master_sessions: SessionData[];
+  invited_sessions: SessionData[];
+}
+
+export default function Dashboard() {
+  const { token } = useAuth();
+  const [gameMasterSessions, setGameMasterSessions] = useState<SessionData[]>([]);
+  const [invitedSessions, setInvitedSessions] = useState<SessionData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSessions = async () => {
+      if (!token) {
+        console.error('Token manquant');
+        return;
+      }
+
       try {
-        const response = await axiosInstance.get('/user-sessions');
-        setSessions(response.data);
+        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        const response = await axiosInstance.get<APIResponse>('/sessions/user');
+        setGameMasterSessions(response.data.game_master_sessions);
+        setInvitedSessions(response.data.invited_sessions);
         setLoading(false);
       } catch (error) {
         console.error('Erreur lors de la récupération des sessions:', error);
@@ -33,42 +48,20 @@ export default function GameMasterSessionsDataGrid() {
     };
 
     fetchSessions();
-  }, []);
-
-  const handleNavigate = (session: SessionData) => {
-    navigate(`/session/manage/${session.token}`, { state: { session } });
-  };
-
-  const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'title', headerName: 'Titre', width: 150 },
-    { field: 'description', headerName: 'Description', width: 300 },
-    {
-      field: 'manage',
-      headerName: 'Manage',
-      width: 150,
-      renderCell: (params: GridRowParams) => (
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => handleNavigate(params.row as SessionData)}
-        >
-          Manage
-        </Button>
-      ),
-    },
-  ];
+  }, [token]);
 
   return (
-    <Box sx={{ height: 400, width: '100%' }}>
-      <DataGrid
-        rows={sessions}
-        columns={columns}
+    <div>
+      <SessionsDataGrid
+        sessions={gameMasterSessions}
         loading={loading}
-        pageSizeOptions={[5, 10, 20]}
-        checkboxSelection
-        disableRowSelectionOnClick
+        title="Sessions où vous êtes Maître de jeu"
       />
-    </Box>
+      <SessionsDataGrid
+        sessions={invitedSessions}
+        loading={loading}
+        title="Sessions où vous êtes Invité"
+      />
+    </div>
   );
 }
