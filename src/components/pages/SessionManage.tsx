@@ -1,12 +1,14 @@
-//import * as React from 'react';
+// src/components/pages/SessionManage.tsx
+
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
 
 interface UserData {
   id: number;
@@ -29,25 +31,24 @@ interface SessionData {
 }
 
 export default function SessionManage() {
-  const { sessionToken } = useParams<{ sessionToken: string }>(); // Token de session depuis l'URL
-  const { token } = useAuth(); // Token d'authentification
+  const { sessionToken } = useParams<{ sessionToken: string }>();
+  const { token } = useAuth();
   const [sessionData, setSessionData] = useState<SessionData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  // Fonction pour supprimer un utilisateur de la session
   const handleRemoveUser = async (userId: number) => {
     if (!token) return;
 
     try {
-      // Appel API pour retirer l'utilisateur de la session
-      await axiosInstance.delete(`/sessions/${sessionToken}/user/${userId}`, {
+      await axiosInstance.delete(`/sessions/${sessionToken}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      
-      // Met à jour les utilisateurs après suppression
+
       setSessionData((prevData) => ({
         ...prevData!,
         users: prevData!.users.filter((user) => user.id !== userId),
@@ -58,7 +59,23 @@ export default function SessionManage() {
     }
   };
 
-  // Colonnes de la DataGrid
+  const handleDeleteSession = async () => {
+    if (!token) return;
+
+    try {
+      await axiosInstance.delete(`/sessions/${sessionToken}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // Redirection après la suppression
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Erreur lors de la suppression de la session:', err);
+      setDeleteError('Une erreur est survenue lors de la suppression de la session.');
+    }
+  };
+
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 90 },
     { field: 'username', headerName: 'Username', width: 150 },
@@ -121,6 +138,24 @@ export default function SessionManage() {
       <Typography variant="body1" gutterBottom>
         Description : {sessionData.description}
       </Typography>
+      <Typography variant="body2" gutterBottom>
+        Créée le : {new Date(sessionData.created_at).toLocaleDateString()}
+      </Typography>
+      <Typography variant="body2" gutterBottom>
+        Dernière mise à jour : {new Date(sessionData.updated_at).toLocaleDateString()}
+      </Typography>
+
+      {deleteError && <Alert severity="error">{deleteError}</Alert>}
+
+      {/* Bouton pour supprimer la session */}
+      <Button
+        variant="contained"
+        color="error"
+        sx={{ marginTop: 2, marginBottom: 2 }}
+        onClick={handleDeleteSession}
+      >
+        Supprimer la session
+      </Button>
 
       <Box sx={{ height: 400, width: '100%', marginTop: 4 }}>
         <Typography variant="h6">Utilisateurs dans la session</Typography>

@@ -1,20 +1,8 @@
-// src/components/pages/Dashboard.tsx
-
-import axiosInstance from '../../api/axios';
 import { useEffect, useState } from 'react';
+import axiosInstance from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 import SessionsDataGrid from '../Sessions/SessionsDataGrid';
-
-interface SessionData {
-  session_id: number;
-  title: string;
-  description: string;
-  token: string;
-  game_master_id: number;
-  is_active: number;
-  created_at: string;
-  updated_at: string;
-}
+import { SessionData } from '../../types';  // Import du type partagé
 
 interface APIResponse {
   game_master_sessions: SessionData[];
@@ -56,11 +44,13 @@ export default function Dashboard() {
         sessions={gameMasterSessions}
         loading={loading}
         title="Sessions où vous êtes Maître de jeu"
+        setSessions={setGameMasterSessions}  // Mise à jour des sessions après suppression
       />
       <SessionsDataGrid
         sessions={invitedSessions}
         loading={loading}
         title="Sessions où vous êtes Invité"
+        setSessions={setInvitedSessions}  // Mise à jour des sessions après suppression
       />
     </div>
   );
