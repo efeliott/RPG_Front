@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import axiosInstance from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 import SessionsDataGrid from '../Sessions/SessionsDataGrid';
-import { SessionData } from '../../types';  // Import du type partagé
+import Button from '@mui/material/Button';
+import CreateSessionModal from '../Sessions/CreateSessionModal';
+import { SessionData } from '../../types';
 
 interface APIResponse {
   game_master_sessions: SessionData[];
@@ -14,43 +16,67 @@ export default function Dashboard() {
   const [gameMasterSessions, setGameMasterSessions] = useState<SessionData[]>([]);
   const [invitedSessions, setInvitedSessions] = useState<SessionData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [openModal, setOpenModal] = useState(false);
 
-  useEffect(() => {
-    const fetchSessions = async () => {
-      if (!token) {
-        console.error('Token manquant');
-        return;
-      }
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
 
-      try {
-        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
 
-        const response = await axiosInstance.get<APIResponse>('/sessions/user');
+  const fetchSessions = async () => {
+    if (!token) {
+      console.error('Token manquant');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+      const response = await axiosInstance.get<APIResponse>('/sessions/user');
+
+      if (response.data) {
         setGameMasterSessions(response.data.game_master_sessions);
         setInvitedSessions(response.data.invited_sessions);
-        setLoading(false);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des sessions:', error);
-        setLoading(false);
       }
-    };
 
+      setLoading(false);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des sessions:', error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchSessions();
   }, [token]);
 
   return (
     <div>
+      <Button variant="contained" color="primary" onClick={handleOpenModal}>
+        Créer une session
+      </Button>
+
       <SessionsDataGrid
         sessions={gameMasterSessions}
         loading={loading}
         title="Sessions où vous êtes Maître de jeu"
-        setSessions={setGameMasterSessions}  // Mise à jour des sessions après suppression
+        setSessions={setGameMasterSessions}
       />
+
       <SessionsDataGrid
         sessions={invitedSessions}
         loading={loading}
         title="Sessions où vous êtes Invité"
-        setSessions={setInvitedSessions}  // Mise à jour des sessions après suppression
+      />
+
+      <CreateSessionModal 
+        open={openModal} 
+        handleClose={handleCloseModal} 
+        setSessions={setGameMasterSessions} 
       />
     </div>
   );
