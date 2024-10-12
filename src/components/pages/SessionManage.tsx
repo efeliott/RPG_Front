@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
+import TextField from '@mui/material/TextField';
 
 interface UserData {
   id: number;
@@ -37,6 +38,9 @@ export default function SessionManage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [inviteEmail, setInviteEmail] = useState<string>(''); // Gestion de l'email à inviter
+  const [inviteSuccess, setInviteSuccess] = useState<string | null>(null); // Gestion du succès d'invitation
+  const [inviteError, setInviteError] = useState<string | null>(null); // Gestion des erreurs d'invitation
   const navigate = useNavigate();
 
   const handleRemoveUser = async (userId: number) => {
@@ -68,13 +72,42 @@ export default function SessionManage() {
           Authorization: `Bearer ${token}`,
         },
       });
-      // Redirection après la suppression
-      navigate('/dashboard');
+      navigate('/dashboard'); // Redirection après la suppression
     } catch (err) {
       console.error('Erreur lors de la suppression de la session:', err);
       setDeleteError('Une erreur est survenue lors de la suppression de la session.');
     }
   };
+
+  const handleInviteUser = async () => {
+    setInviteError(null);
+    setInviteSuccess(null);
+  
+    if (!token) return;
+  
+    try {
+      const response = await axiosInstance.post(
+        `/sessions/${sessionToken}/invite`, // Note l'utilisation correcte de la route avec le sessionToken
+        { email: inviteEmail }, // Le payload avec l'email de l'utilisateur
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Authentification avec le token JWT
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        setInviteSuccess('Invitation envoyée avec succès !');
+        setInviteEmail(''); // Réinitialise le champ email après l'envoi
+      } else {
+        setInviteError("Une erreur s'est produite lors de l'envoi de l'invitation.");
+      }
+    } catch (error) {
+      setInviteError("L'invitation a échoué. Veuillez vérifier l'adresse e-mail.");
+      console.error('Erreur lors de l\'envoi de l\'invitation:', error);
+    }
+  };
+  
 
   const columns: GridColDef[] = [
     { field: 'id', headerName: 'ID', width: 90 },
@@ -156,6 +189,28 @@ export default function SessionManage() {
       >
         Supprimer la session
       </Button>
+
+      {/* Champ d'invitation */}
+      <Box sx={{ marginTop: 4 }}>
+        <Typography variant="h6">Inviter un utilisateur à la session</Typography>
+        <TextField
+          label="Email de l'utilisateur"
+          variant="outlined"
+          fullWidth
+          value={inviteEmail}
+          onChange={(e) => setInviteEmail(e.target.value)}
+          sx={{ marginBottom: 2 }}
+        />
+        {inviteError && <Alert severity="error">{inviteError}</Alert>}
+        {inviteSuccess && <Alert severity="success">{inviteSuccess}</Alert>}
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleInviteUser}
+        >
+          Envoyer l'invitation
+        </Button>
+      </Box>
 
       <Box sx={{ height: 400, width: '100%', marginTop: 4 }}>
         <Typography variant="h6">Utilisateurs dans la session</Typography>
