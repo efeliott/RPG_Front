@@ -6,7 +6,7 @@ import SignUp from './components/auth/Signup';
 import Dashboard from './components/pages/Dashboard';
 import SessionManage from './components/pages/SessionManage';
 import { AuthProvider } from './context/AuthContext';
-import ProtectedLayout from './components/layout/ProtectedLayout'; // Importe le layout protégé
+import ProtectedLayout from './components/layout/ProtectedLayout';
 
 const App: React.FC = () => {
     return (

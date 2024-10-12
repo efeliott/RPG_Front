@@ -1,11 +1,11 @@
 import React from 'react';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import DashboardIcon from '@mui/icons-material/Dashboard';
+import HomeIcon from '@mui/icons-material/Home';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import { createTheme } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom'; // Import de useNavigate
+import { useNavigate } from 'react-router-dom';
 
 const NAVIGATION = [
   {
@@ -15,7 +15,7 @@ const NAVIGATION = [
   {
     segment: 'dashboard',
     title: 'Dashboard',
-    icon: <DashboardIcon />,
+    icon: <HomeIcon />,
   },
   {
     segment: 'orders',
@@ -58,14 +58,13 @@ const DashboardLayoutBasic: React.FC = () => {
     },
   };
 
-  return (
-    <AppProvider navigation={NAVIGATION} router={router} theme={demoTheme}>
+return (
+    <AppProvider  navigation={NAVIGATION} 
+                  router={router} 
+                  theme={demoTheme} 
+                  branding={{logo: <img src="src\assets\logo_game-master_blue.svg" alt="Game master logo" />,title: 'RPG',}}>
       <DashboardLayout>
-        <div
-          style={{
-            top: '6rem ',
-          }}
-        />
+        <div style={{ top: '6rem ',}}/>
       </DashboardLayout>
     </AppProvider>
   );
