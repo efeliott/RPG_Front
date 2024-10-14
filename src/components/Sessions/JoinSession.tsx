@@ -1,52 +1,55 @@
-// src/components/Sessions/JoinSession.tsx
-
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
+import Typography from '@mui/material/Typography';
 
-const JoinSession: React.FC = () => {
-  const { token } = useParams<{ token: string }>(); // Récupération du token d'invitation depuis l'URL
-  const { isAuthenticated, token: authToken } = useAuth(); // Vérifie si l'utilisateur est authentifié et récupère le token d'authentification
-  const [message, setMessage] = useState<string>(''); // Message pour l'utilisateur
-  const navigate = useNavigate(); // Permet de rediriger après succès ou échec
+const SessionJoin = () => {
+  const { sessionToken } = useParams<{ sessionToken: string }>();
+  const { token } = useAuth();
+  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const joinSession = async () => {
-      if (!isAuthenticated) {
-        setMessage('Vous devez être connecté pour rejoindre une session.');
+      if (!token) {
+        // Si pas connecté, rediriger vers la page de connexion
+        navigate(`/signin?redirect=/join-session/${sessionToken}`);
         return;
       }
 
       try {
-        // Appel à l'API Laravel pour rejoindre la session
-        const response = await axiosInstance.post(
+        // Envoyer une requête pour rejoindre la session
+        await axiosInstance.post(
           '/join-session',
-          { session_token: token },
-          { headers: { Authorization: `Bearer ${authToken}` } }
+          { session_token: sessionToken }, // Envoyer le token d'invitation
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
 
-        if (response.data && response.status === 200) {
-          setMessage('Vous avez rejoint la session avec succès !');
-          setTimeout(() => navigate('/dashboard'), 3000);
-        } else {
-          setMessage('Erreur lors de la tentative de rejoindre la session.');
-        }
-      } catch (error) {
-        setMessage('Le lien est invalide ou a déjà été utilisé.');
-        console.error('Erreur lors de la tentative de rejoindre la session:', error);
+        navigate('/dashboard'); // Rediriger après succès
+      } catch (err) {
+        setError("Erreur lors de la tentative de rejoindre la session.");
+        setLoading(false);
       }
     };
 
     joinSession();
-  }, [isAuthenticated, token, authToken, navigate]);
+  }, [sessionToken, token, navigate]);
+
+  if (loading) {
+    return <Typography>Chargement en cours...</Typography>;
+  }
 
   return (
     <div>
-      <h1>Rejoindre une Session</h1>
-      <p>{message}</p>
+      {error && <Typography color="error">{error}</Typography>}
     </div>
   );
 };
 
-export default JoinSession;
+export default SessionJoin;

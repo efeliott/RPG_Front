@@ -1,7 +1,6 @@
-// src/components/auth/SignIn.tsx
 import React, { useState } from 'react';
 import axiosInstance from '../../api/axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // Ajout de useLocation pour gérer la redirection
 import { useAuth } from '../../context/AuthContext';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -20,7 +19,9 @@ const SignIn: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string>(''); 
   const { setToken } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation(); // Utilisation de useLocation pour vérifier s'il y a une URL de redirection
 
+  // Gestion de la connexion
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage('');
@@ -29,7 +30,10 @@ const SignIn: React.FC = () => {
       const response = await axiosInstance.post('/login', { email, password });
       if (response.data && response.data.access_token) {
         setToken(response.data.access_token);
-        navigate('/dashboard');
+
+        // Vérification de la redirection après connexion
+        const redirectTo = new URLSearchParams(location.search).get('redirect') || '/dashboard'; // Redirige vers la page dashboard ou une autre
+        navigate(redirectTo); // Redirection vers la page cible après connexion
       } else {
         setErrorMessage("Erreur: Le token d'authentification est introuvable.");
       }
