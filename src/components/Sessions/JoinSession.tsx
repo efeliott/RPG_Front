@@ -4,34 +4,40 @@ import axiosInstance from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
 import Typography from '@mui/material/Typography';
 
-const SessionJoin = () => {
-  const { sessionToken } = useParams<{ sessionToken: string }>();
-  const { token } = useAuth();
+const JoinSession = () => {
+  const { sessionToken } = useParams<{ sessionToken: string }>(); // Récupération du token de l'URL
+  const { token } = useAuth(); // Récupération du token utilisateur pour l'authentification
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const joinSession = async () => {
+      if (!sessionToken) {
+        setError("Token d'invitation invalide.");
+        setLoading(false);
+        return;
+      }
+
+      // Vérifie si l'utilisateur est connecté, sinon, redirection vers la page de connexion
       if (!token) {
-        // Si pas connecté, rediriger vers la page de connexion
         navigate(`/signin?redirect=/join-session/${sessionToken}`);
         return;
       }
 
       try {
-        // Envoyer une requête pour rejoindre la session
+        // Requête pour rejoindre la session
         await axiosInstance.post(
           '/join-session',
-          { session_token: sessionToken }, // Envoyer le token d'invitation
+          { session_token: sessionToken }, // Le token d'invitation à la session
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${token}`, // Authentification de l'utilisateur
             },
           }
         );
-
-        navigate('/dashboard'); // Rediriger après succès
+        // Redirection vers le tableau de bord après succès
+        navigate('/dashboard');
       } catch (err) {
         setError("Erreur lors de la tentative de rejoindre la session.");
         setLoading(false);
@@ -52,4 +58,4 @@ const SessionJoin = () => {
   );
 };
 
-export default SessionJoin;
+export default JoinSession;

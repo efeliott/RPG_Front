@@ -19,7 +19,7 @@ const App: React.FC = () => {
                     <Route path="/" element={<SignIn />} />
                     <Route path="/signin" element={<SignIn />} />
                     <Route path="/signup" element={<SignUp />} />
-                    <Route path="/join-session/:token" element={<JoinSession />} />
+                    <Route path="/join-session/:sessionToken" element={<JoinSession />} />
                     
                     {/* Routes avec le Sidebar encapsulées dans ProtectedLayout */}
                     <Route element={<ProtectedLayout />}>
