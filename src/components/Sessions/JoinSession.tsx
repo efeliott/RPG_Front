@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 
 const JoinSession = () => {
   const { sessionToken } = useParams<{ sessionToken: string }>(); // Récupération du token de l'URL
-  const { token } = useAuth(); // Récupération du token utilisateur pour l'authentification
+  const { token } = useAuth(); // Token utilisateur pour l'authentification
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -19,7 +19,7 @@ const JoinSession = () => {
         return;
       }
 
-      // Vérifie si l'utilisateur est connecté, sinon, redirection vers la page de connexion
+      // Vérifie que l'utilisateur est connecté
       if (!token) {
         navigate(`/signin?redirect=/join-session/${sessionToken}`);
         return;
@@ -27,24 +27,29 @@ const JoinSession = () => {
 
       try {
         // Requête pour rejoindre la session
-        await axiosInstance.post(
+        const response = await axiosInstance.post(
           '/join-session',
-          { session_token: sessionToken }, // Le token d'invitation à la session
+          { session_token: sessionToken },
           {
             headers: {
-              Authorization: `Bearer ${token}`, // Authentification de l'utilisateur
+              Authorization: `Bearer ${token}`,
             },
           }
         );
-        // Redirection vers le tableau de bord après succès
-        navigate('/dashboard');
+        if (response.status === 200) {
+          navigate('/dashboard');
+        }
       } catch (err) {
         setError("Erreur lors de la tentative de rejoindre la session.");
         setLoading(false);
       }
     };
 
-    joinSession();
+    if (token) {
+      joinSession();
+    } else {
+      setLoading(false);
+    }
   }, [sessionToken, token, navigate]);
 
   if (loading) {
