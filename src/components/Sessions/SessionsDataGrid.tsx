@@ -1,3 +1,5 @@
+// src/components/Sessions/SessionsDataGrid.tsx
+
 import * as React from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -207,8 +209,16 @@ const SessionsDataGrid: React.FC<{ sessions: SessionData[], setSessions: React.D
                         variant="contained"
                         color="primary"
                         onClick={() => navigate(`/session/manage/${session.token}`)}
+                        sx={{ mr: 1 }}
                       >
                         Gérer
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="secondary"
+                        onClick={() => navigate(`/game-master/${session.session_id}`)}
+                      >
+                        Gérer en tant que Game Master
                       </Button>
                     </TableCell>
                   </TableRow>
