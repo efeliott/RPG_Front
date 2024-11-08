@@ -8,6 +8,7 @@ import CharacterList from '../SessionsManagment/CharacterList';
 import WalletManagement from '../SessionsManagment/WalletManagment';
 import InventoryManagement from '../SessionsManagment/InventoryManagment';
 import AddCharacter from '../SessionsManagment/AddCharacter';
+import ShopManagement from '../shops/ShopManagement';
 import axiosInstance from '../../api/axios';
 
 interface User {
@@ -89,6 +90,7 @@ const GameMasterManagement: React.FC = () => {
       <Tab label="Personnages" />
       <Tab label="Wallets" />
       <Tab label="Inventaire" />
+      <Tab label="Shop" />
       </Tabs>
 
       <Box sx={{ marginTop: 3 }}>
@@ -110,6 +112,7 @@ const GameMasterManagement: React.FC = () => {
       )}
       {tabValue === 1 && <WalletManagement sessionId={Number(sessionId)} />}
       {tabValue === 2 && <InventoryManagement characterId={Number(sessionId)} />}
+      {tabValue === 3 && <ShopManagement sessionId={Number(sessionId)} />}
       </Box>
 
       {selectedUser && (
