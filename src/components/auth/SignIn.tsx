@@ -13,6 +13,19 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 
+function Copyright(props: { sx: object }) {
+  return (
+    <Typography variant="body2" color="text.secondary" align="center" {...props}>
+      {'Copyright © '}
+      <Link color="inherit" href="#">
+        Eliott FERTILLE
+      </Link>{' '}
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
+  );
+}
+
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState<string>('');  
   const [password, setPassword] = useState<string>('');  
@@ -112,6 +125,7 @@ const SignIn: React.FC = () => {
             </Grid>
         </Box>
       </Box>
+      <Copyright sx={{ mt: 5 }} />
     </Container>
   );
 };

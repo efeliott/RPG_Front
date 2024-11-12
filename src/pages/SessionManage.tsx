@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axiosInstance from '../../api/axios';
-import { useAuth } from '../../context/AuthContext';
+import axiosInstance from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { DataGrid, GridColDef, GridRenderCellParams } from '@mui/x-data-grid';

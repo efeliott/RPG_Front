@@ -6,38 +6,8 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import { createTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-
-const NAVIGATION = [
-  {
-    kind: 'page' as const,
-    title: 'Main items',
-  },
-  {
-    segment: 'dashboard',
-    title: 'Dashboard',
-    icon: <HomeIcon />,
-  },
-  {
-    segment: 'orders',
-    title: 'Orders',
-    icon: <ShoppingCartIcon />,
-  },
-  {
-    segment: 'reports',
-    title: 'Reports',
-    icon: <BarChartIcon />,
-    children: [
-      {
-        segment: 'sales',
-        title: 'Sales',
-      },
-      {
-        segment: 'traffic',
-        title: 'Traffic',
-      },
-    ],
-  },
-];
+import logo from '../assets/logo_game-master_blue.svg';
+import { useAuth } from '../context/AuthContext';
 
 const demoTheme = createTheme({
   palette: {
@@ -46,8 +16,41 @@ const demoTheme = createTheme({
 });
 
 const DashboardLayoutBasic: React.FC = () => {
+  const { user } = useAuth();
   const [pathname, setPathname] = React.useState('/dashboard');
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+
+  const NAVIGATION = [
+    {
+      kind: 'page' as const,
+      title: user ? `Bonjour, ${user.name}` : 'Main items',
+    },
+    {
+      segment: 'dashboard',
+      title: 'Dashboard',
+      icon: <HomeIcon />,
+    },
+    {
+      segment: 'orders',
+      title: 'Orders',
+      icon: <ShoppingCartIcon />,
+    },
+    {
+      segment: 'reports',
+      title: 'Reports',
+      icon: <BarChartIcon />,
+      children: [
+        {
+          segment: 'sales',
+          title: 'Sales',
+        },
+        {
+          segment: 'traffic',
+          title: 'Traffic',
+        },
+      ],
+    },
+  ];
 
   const router = {
     pathname,
@@ -58,13 +61,18 @@ const DashboardLayoutBasic: React.FC = () => {
     },
   };
 
-return (
-    <AppProvider  navigation={NAVIGATION} 
-                  router={router} 
-                  theme={demoTheme} 
-                  branding={{logo: <img src="src\assets\logo_game-master_blue.svg" alt="Game master logo" />,title: 'RPG',}}>
+  return (
+    <AppProvider
+      navigation={NAVIGATION}
+      router={router}
+      theme={demoTheme}
+      branding={{
+        logo: <img src={logo} alt="Game master logo" />,
+        title: 'RPG',
+      }}
+    >
       <DashboardLayout>
-        <div style={{ top: '6rem ',}}/>
+        <div style={{ top: '6rem' }} />
       </DashboardLayout>
     </AppProvider>
   );

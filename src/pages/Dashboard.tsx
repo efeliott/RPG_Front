@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import axiosInstance from '../../api/axios';
-import { useAuth } from '../../context/AuthContext';
-import SessionsDataGrid from '../Sessions/SessionsDataGrid';
+import axiosInstance from '../api/axios';
+import { useAuth } from '../context/AuthContext';
+import SessionsDataGrid from '../components/Sessions/SessionsDataGrid';
 import Button from '@mui/material/Button';
-import CreateSessionModal from '../Sessions/CreateSessionModal';
-import { SessionData } from '../../types';
+import CreateSessionModal from '../components/Sessions/CreateSessionModal';
+import { SessionData } from '../types';
 
 interface APIResponse {
   game_master_sessions: SessionData[];

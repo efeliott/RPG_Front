@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, TextField } from '@mui/material';
 import axiosInstance from '../../api/axios';
 
 interface Wallet {
@@ -15,6 +15,7 @@ interface Wallet {
 
 const WalletManagement: React.FC<{ sessionId: number }> = ({ sessionId }) => {
   const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [customAmounts, setCustomAmounts] = useState<{ [key: number]: number }>({});
 
   useEffect(() => {
     const fetchWallets = async () => {
@@ -28,6 +29,13 @@ const WalletManagement: React.FC<{ sessionId: number }> = ({ sessionId }) => {
     await axiosInstance.put(`/session-management/wallet/${walletId}`, { amount });
     const response = await axiosInstance.get(`/session-management/${sessionId}/wallets`);
     setWallets(response.data);
+  };
+
+  const handleCustomAmountChange = (walletId: number, amount: number) => {
+    setCustomAmounts((prev) => ({
+      ...prev,
+      [walletId]: amount,
+    }));
   };
 
   return (
@@ -50,6 +58,17 @@ const WalletManagement: React.FC<{ sessionId: number }> = ({ sessionId }) => {
               <TableCell align="right">
                 <Button onClick={() => updateWallet(wallet.id, 10)}>+10</Button>
                 <Button onClick={() => updateWallet(wallet.id, -10)}>-10</Button>
+                <TextField
+                  type="number"
+                  value={customAmounts[wallet.id] || ''}
+                  onChange={(e) => handleCustomAmountChange(wallet.id, Number(e.target.value))}
+                  placeholder="Custom Amount"
+                  size="small"
+                  style={{ width: 100, marginLeft: 8 }}
+                />
+                <Button onClick={() => updateWallet(wallet.id, customAmounts[wallet.id] || 0)} disabled={!customAmounts[wallet.id]}>
+                  Appliquer
+                </Button>
               </TableCell>
             </TableRow>
           ))}
