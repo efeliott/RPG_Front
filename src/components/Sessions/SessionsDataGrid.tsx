@@ -102,7 +102,14 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
   );
 }
 
-const SessionsDataGrid: React.FC<{ sessions: SessionData[], setSessions: React.Dispatch<React.SetStateAction<SessionData[]>> }> = ({ sessions, setSessions }) => {
+interface SessionsDataGridProps {
+  sessions: SessionData[];
+  loading: boolean;
+  title: string;
+  setSessions?: React.Dispatch<React.SetStateAction<SessionData[]>>;
+}
+
+const SessionsDataGrid: React.FC<SessionsDataGridProps> = ({ sessions, loading, title, setSessions }) => {
   const { token } = useAuth();
   const navigate = useNavigate();
   const [selected, setSelected] = React.useState<readonly number[]>([]);
@@ -120,7 +127,7 @@ const SessionsDataGrid: React.FC<{ sessions: SessionData[], setSessions: React.D
           });
         }
       }
-      setSessions(prevSessions => prevSessions.filter(s => !selected.includes(s.session_id)));
+      setSessions?.(prevSessions => prevSessions.filter(s => !selected.includes(s.session_id)));
       setSelected([]);
     } catch (error) {
       console.error('Erreur lors de la suppression', error);
@@ -168,80 +175,87 @@ const SessionsDataGrid: React.FC<{ sessions: SessionData[], setSessions: React.D
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} handleDeleteSessions={handleDeleteSessions} />
-        <TableContainer>
-          <Table sx={{ minWidth: 750 }}>
-            <EnhancedTableHead
-              numSelected={selected.length}
-              rowCount={sessions.length}
-              onSelectAllClick={handleSelectAllClick}
-            />
-            <TableBody>
-              {sessions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((session, index) => {
-                const isItemSelected = isSelected(session.session_id);
-                const labelId = `enhanced-table-checkbox-${index}`;
+      <Typography variant="h6" gutterBottom>
+        {title}
+      </Typography>
+      {loading ? (
+        <Typography>Loading...</Typography>
+      ) : (
+        <Paper sx={{ width: '100%', mb: 2 }}>
+          <EnhancedTableToolbar numSelected={selected.length} handleDeleteSessions={handleDeleteSessions} />
+          <TableContainer>
+            <Table sx={{ minWidth: 750 }}>
+              <EnhancedTableHead
+                numSelected={selected.length}
+                rowCount={sessions.length}
+                onSelectAllClick={handleSelectAllClick}
+              />
+              <TableBody>
+                {sessions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((session, index) => {
+                  const isItemSelected = isSelected(session.session_id);
+                  const labelId = `enhanced-table-checkbox-${index}`;
 
-                return (
-                  <TableRow
-                    hover
-                    onClick={() => handleClick(session.session_id)}
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={session.session_id}
-                    selected={isItemSelected}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          'aria-labelledby': labelId,
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell component="th" id={labelId} scope="row">{session.session_id}</TableCell>
-                    <TableCell>{session.title}</TableCell>
-                    <TableCell>{session.description}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={() => navigate(`/session/manage/${session.token}`)}
-                        sx={{ mr: 1 }}
-                      >
-                        Gérer
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        color="secondary"
-                        onClick={() => navigate(`/game-master/${session.session_id}`)}
-                      >
-                        Gérer en tant que Game Master
-                      </Button>
-                    </TableCell>
+                  return (
+                    <TableRow
+                      hover
+                      onClick={() => handleClick(session.session_id)}
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={session.session_id}
+                      selected={isItemSelected}
+                    >
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          inputProps={{
+                            'aria-labelledby': labelId,
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell component="th" id={labelId} scope="row">{session.session_id}</TableCell>
+                      <TableCell>{session.title}</TableCell>
+                      <TableCell>{session.description}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => navigate(`/session/manage/${session.token}`)}
+                          sx={{ mr: 1 }}
+                        >
+                          Gérer
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="secondary"
+                          onClick={() => navigate(`/game-master/${session.session_id}`)}
+                        >
+                          Gérer en tant que Game Master
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 53 * emptyRows }}>
+                    <TableCell colSpan={6} />
                   </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={sessions.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Paper>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={sessions.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+      )}
     </Box>
   );
 };

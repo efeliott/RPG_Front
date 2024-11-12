@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography, Tabs, Tab, Button } from '@mui/material';
+import { Box, Typography, Tabs, Tab } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import CharacterList from '../components/Characters/CharacterList';
 import WalletManagement from '../components/Wallets/WalletManagment';
 import InventoryList from '../components/Inventories/InventoryList';
 import ShopManagement from '../components/Shops/ShopManagement';
 import QuestList from '../components/Quests/QuestList';
-import QuestForm from '../components/Quests/QuestForm';
 import axiosInstance from '../api/axios';
 
 const GameMasterManagement: React.FC = () => {
@@ -16,7 +15,6 @@ const GameMasterManagement: React.FC = () => {
   const [isGameMaster, setIsGameMaster] = useState(false);
   const [sessionData, setSessionData] = useState<any>(null);
   const [tabValue, setTabValue] = useState(0);
-  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchSessionData = async () => {
@@ -36,14 +34,6 @@ const GameMasterManagement: React.FC = () => {
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-  };
-
-  const handleOpenDialog = () => {
-    setDialogOpen(true);
-  };
-
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
   };
 
   if (!isGameMaster) {
@@ -68,21 +58,7 @@ const GameMasterManagement: React.FC = () => {
         {tabValue === 1 && <WalletManagement sessionId={Number(sessionId)} />}
         {tabValue === 2 && <InventoryList sessionId={Number(sessionId)} />}
         {tabValue === 3 && <ShopManagement sessionId={Number(sessionId)} />}
-        {tabValue === 4 && (
-          <>
-            <Button variant="contained" onClick={handleOpenDialog} sx={{ marginBottom: 2 }}>Créer une Quête</Button>
-            <QuestList sessionId={Number(sessionId)} />
-            {dialogOpen && (
-              <QuestForm
-                sessionId={Number(sessionId)}
-                onSave={() => {
-                  handleCloseDialog();
-                  // Actualise la liste des quêtes après la création ou la modification
-                }}
-              />
-            )}
-          </>
-        )}
+        {tabValue === 4 && <QuestList sessionId={Number(sessionId)} />}
       </Box>
     </Box>
   );
