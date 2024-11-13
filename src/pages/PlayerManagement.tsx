@@ -1,14 +1,12 @@
-// src/components/pages/PlayerManagement.tsx
-
 import React, { useEffect, useState } from 'react';
 import { PlayerSessionProvider, usePlayerSession } from '../context/PlayerSessionContext';
 import { useParams } from 'react-router-dom';
 import { Box, Typography, Tabs, Tab } from '@mui/material';
 import PlayerInventory from '../components/Inventories/PlayerInventory';
 import PlayerCharacter from '../components/Characters/PlayerCharacter';
-import PlayerWallet from '../components/Wallets/PlayerWallet';
 import PlayerShop from '../components/Shops/PlayerShop';
 import PlayerQuests from '../components/Quests/PlayerQuests';
+import WalletEncart from '../components/Wallets/WalletEncart.tsx';
 import axiosInstance from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
@@ -29,9 +27,14 @@ const PlayerManagementContent: React.FC<{ sessionId: number }> = ({ sessionId })
       <Typography variant="h4" gutterBottom>
         Tableau de Bord Joueur - {character ? character.name : 'Chargement...'}
       </Typography>
+
+      {/* Affichage de l'encart Wallet en haut, toujours visible */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
+        <WalletEncart sessionId={sessionId} />
+      </Box>
+
       <Tabs value={tabValue} onChange={handleTabChange} aria-label="Gestion Joueur">
         <Tab label="Personnage" />
-        <Tab label="Porte-monnaie" />
         <Tab label="Inventaire" />
         <Tab label="Magasin" />
         <Tab label="Quêtes" />
@@ -39,10 +42,9 @@ const PlayerManagementContent: React.FC<{ sessionId: number }> = ({ sessionId })
 
       <Box sx={{ marginTop: 3 }}>
         {tabValue === 0 && <PlayerCharacter sessionId={sessionId} />}
-        {tabValue === 1 && <PlayerWallet sessionId={sessionId} />}
-        {tabValue === 2 && <PlayerInventory sessionId={sessionId} />}
-        {tabValue === 3 && <PlayerShop sessionId={sessionId} />}
-        {tabValue === 4 && <PlayerQuests sessionId={sessionId} />}
+        {tabValue === 1 && <PlayerInventory sessionId={sessionId} />}
+        {tabValue === 2 && <PlayerShop sessionId={sessionId} />}
+        {tabValue === 3 && <PlayerQuests sessionId={sessionId} />}
       </Box>
     </Box>
   );
