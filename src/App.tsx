@@ -10,6 +10,7 @@ import GameMasterManagement from './pages/GameMasterManagment';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedLayout from './components/Layout/ProtectedLayout';
 import JoinSession from './components/Sessions/JoinSession';
+import PlayerManagement from './pages/PlayerManagement'; 
 // import NotFound from './components/pages/NotFound'; // Composant NotFound pour les routes non trouvées
 
 const App: React.FC = () => {
@@ -22,12 +23,15 @@ const App: React.FC = () => {
                     <Route path="/signin" element={<SignIn />} />
                     <Route path="/signup" element={<SignUp />} />
                     <Route path="/join-session/:sessionToken" element={<JoinSession />} />
+
+                    
                     
                     {/* Routes protégées */}
                     <Route element={<ProtectedLayout />}>
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/session/manage/:sessionToken" element={<SessionManage />} />
-                        <Route path="/game-master/:sessionId" element={<GameMasterManagement />} />
+                        <Route path="/game-master/:sessionToken" element={<GameMasterManagement />} />
+                    <Route path="/player/:sessionToken" element={<PlayerManagement />} />
                     </Route>
 
                     {/* Route 404 */}

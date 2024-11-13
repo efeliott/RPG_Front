@@ -1,3 +1,5 @@
+// src/pages/Dashboard.tsx
+
 import { useEffect, useState } from 'react';
 import axiosInstance from '../api/axios';
 import { useAuth } from '../context/AuthContext';
@@ -18,13 +20,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState<boolean>(true);
   const [openModal, setOpenModal] = useState(false);
 
-  const handleOpenModal = () => {
-    setOpenModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(false);
-  };
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
 
   const fetchSessions = async () => {
     if (!token) {
@@ -37,12 +34,10 @@ export default function Dashboard() {
       axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
       const response = await axiosInstance.get<APIResponse>('/sessions/user');
-
       if (response.data) {
         setGameMasterSessions(response.data.game_master_sessions);
         setInvitedSessions(response.data.invited_sessions);
       }
-
       setLoading(false);
     } catch (error) {
       console.error('Erreur lors de la récupération des sessions:', error);
@@ -65,12 +60,14 @@ export default function Dashboard() {
         loading={loading}
         title="Sessions où vous êtes Maître de jeu"
         setSessions={setGameMasterSessions}
+        isGameMaster={true} // Pour Game Master
       />
 
       <SessionsDataGrid
         sessions={invitedSessions}
         loading={loading}
         title="Sessions où vous êtes Invité"
+        isGameMaster={false} // Pour Player
       />
 
       <CreateSessionModal 

@@ -30,6 +30,7 @@ const defaultTheme = createTheme();
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const [error, setError] = React.useState<string | null>(null); // Pour afficher une erreur si nécessaire
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,15 +39,18 @@ export default function SignUp() {
     try {
       const response = await axiosInstance.post('/register', {
         username: data.get('username') as string,
+        name: data.get('name') as string,
         email: data.get('email') as string,
         password: data.get('password') as string,
         password_confirmation: data.get('password_confirmation') as string,
       });
 
-      console.log(response.data);
-      navigate('/signup');
+      if (response.status === 201) {
+        navigate('/signin'); // Redirection en cas de succès
+      }
     } catch (error) {
-      console.error('Erreur d\'inscription', error);
+      setError("Erreur d'inscription. Veuillez vérifier vos informations."); // Affiche une erreur si nécessaire
+      console.error("Erreur d'inscription", error);
     }
   };
 
@@ -79,6 +83,15 @@ export default function SignUp() {
                   name="username"
                   autoComplete="username"
                   autoFocus
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  id="name"
+                  label="Name"
+                  name="name"
+                  autoComplete="name"
                 />
               </Grid>
               <Grid item xs={12}>
@@ -122,6 +135,11 @@ export default function SignUp() {
             >
               Sign Up
             </Button>
+            {error && (
+              <Typography color="error" variant="body2" align="center" sx={{ mt: 2 }}>
+                {error}
+              </Typography>
+            )}
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link href="/signin" variant="body2">

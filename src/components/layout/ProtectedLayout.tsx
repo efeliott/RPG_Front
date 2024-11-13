@@ -9,34 +9,43 @@ import axiosInstance from '../../api/axios';
 const ProtectedLayout: React.FC = () => {
     const { token, user } = useAuth();
     const location = useLocation();
-    const { sessionId } = useParams<{ sessionId: string }>();
-    const [isGameMaster, setIsGameMaster] = useState(false);
+    const { sessionToken } = useParams<{ sessionToken: string }>();
+    const [isGameMaster, setIsGameMaster] = useState(true); // Initialisation à true pour éviter la double vérification
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (sessionId && user) {
-            // Vérifie si l'utilisateur est le Game Master pour cette session
+        const isGameMasterRoute = location.pathname.startsWith('/game-master');
+
+        if (isGameMasterRoute && sessionToken && user) {
+            // Effectue la vérification seulement pour les routes Game Master
             const fetchSessionData = async () => {
                 try {
-                    const response = await axiosInstance.get(`/game-master/${sessionId}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
+                    const response = await axiosInstance.get(`/game-master/${sessionToken}`, {
+                        headers: { Authorization: `Bearer ${token}` },
                     });
                     setIsGameMaster(response.data.game_master_id === user.id);
                 } catch (error) {
                     console.error('Erreur lors de la vérification du rôle Game Master:', error);
+                    setIsGameMaster(false);
+                } finally {
+                    setLoading(false);
                 }
             };
             fetchSessionData();
+        } else {
+            setLoading(false); // Désactive le chargement immédiatement si la route n'est pas Game Master
         }
-    }, [sessionId, user, token]);
+    }, [sessionToken, user, token, location.pathname]);
 
     if (!token) {
         return <Navigate to="/signin" state={{ from: location }} />;
     }
 
-    const isGameMasterRoute = location.pathname.startsWith('/game-master');
-    if (isGameMasterRoute && !isGameMaster) {
+    if (loading) {
+        return <div>Chargement...</div>;
+    }
+
+    if (location.pathname.startsWith('/game-master') && !isGameMaster) {
         return <Navigate to="/dashboard" />;
     }
 
