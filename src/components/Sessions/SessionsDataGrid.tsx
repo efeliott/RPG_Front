@@ -107,9 +107,10 @@ interface SessionsDataGridProps {
   loading: boolean;
   title: string;
   setSessions?: React.Dispatch<React.SetStateAction<SessionData[]>>;
+  isGameMaster?: boolean; // Ajout de la nouvelle prop pour différencier les routes
 }
 
-const SessionsDataGrid: React.FC<SessionsDataGridProps> = ({ sessions, loading, title, setSessions }) => {
+const SessionsDataGrid: React.FC<SessionsDataGridProps> = ({ sessions, loading, title, setSessions, isGameMaster }) => {
   const { token } = useAuth();
   const navigate = useNavigate();
   const [selected, setSelected] = React.useState<readonly number[]>([]);
@@ -218,21 +219,36 @@ const SessionsDataGrid: React.FC<SessionsDataGridProps> = ({ sessions, loading, 
                       <TableCell>{session.title}</TableCell>
                       <TableCell>{session.description}</TableCell>
                       <TableCell>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() => navigate(`/session/manage/${session.token}`)}
-                          sx={{ mr: 1 }}
-                        >
-                          Gérer
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          color="secondary"
-                          onClick={() => navigate(`/game-master/${session.session_id}`)}
-                        >
-                          Gérer en tant que Game Master
-                        </Button>
+                        {isGameMaster ? (
+                          <>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              onClick={() => navigate(`/session/manage/${session.token}`)}
+                              sx={{ mr: 1 }}
+                            >
+                              Gérer
+                            </Button>
+                            <Button
+                              variant="outlined"
+                              color="secondary"
+                              onClick={(e) => {
+                                e.stopPropagation(); // Empêche la propagation du clic au niveau de la ligne
+                                navigate(`/game-master/${session.token}`);
+                              }}
+                            >
+                              Gérer en tant que Game Master
+                            </Button>
+                          </>
+                        ) : (
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => navigate(`/player/${session.token}`)}
+                          >
+                            Accéder en tant qu'invité
+                          </Button>
+                        )}
                       </TableCell>
                     </TableRow>
                   );

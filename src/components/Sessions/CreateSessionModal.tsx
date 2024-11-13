@@ -1,5 +1,3 @@
-// src/components/Sessions/CreateSessionModal.tsx
-
 import React, { useState } from 'react';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
@@ -13,7 +11,7 @@ import { useAuth } from '../../context/AuthContext';
 interface CreateSessionModalProps {
   open: boolean;
   handleClose: () => void;
-  setSessions: React.Dispatch<React.SetStateAction<any[]>>; // Fonction pour mettre à jour les sessions
+  setSessions: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
 const CreateSessionModal: React.FC<CreateSessionModalProps> = ({ open, handleClose, setSessions }) => {
@@ -46,17 +44,15 @@ const CreateSessionModal: React.FC<CreateSessionModalProps> = ({ open, handleClo
         }
       );
 
-      // Ajouter la nouvelle session aux sessions existantes
       setSessions((prevSessions) => [...prevSessions, response.data.session]);
 
       setSnackbarMessage('Session créée avec succès!');
       setSnackbarSeverity('success');
       setSnackbarOpen(true);
 
-      // Réinitialise le formulaire
       setNewSessionTitle('');
       setNewSessionDescription('');
-      handleClose(); // Fermer la modal après succès
+      handleClose();
 
     } catch (error) {
       console.error('Erreur lors de la création de la session:', error);
@@ -68,7 +64,6 @@ const CreateSessionModal: React.FC<CreateSessionModalProps> = ({ open, handleClo
 
   return (
     <>
-      {/* Modal */}
       <Modal
         open={open}
         onClose={handleClose}
@@ -96,6 +91,7 @@ const CreateSessionModal: React.FC<CreateSessionModalProps> = ({ open, handleClo
             onChange={(e) => setNewSessionTitle(e.target.value)}
             fullWidth
             sx={{ marginBottom: 2 }}
+            inputProps={{ 'data-testid': 'session-title-input' }} // Ajout de data-testid
           />
           <TextField
             label="Description de la session (optionnelle)"
@@ -104,14 +100,19 @@ const CreateSessionModal: React.FC<CreateSessionModalProps> = ({ open, handleClo
             onChange={(e) => setNewSessionDescription(e.target.value)}
             fullWidth
             sx={{ marginBottom: 2 }}
+            inputProps={{ 'data-testid': 'session-description-input' }} // Ajout de data-testid
           />
-          <Button variant="contained" color="primary" onClick={handleCreateSession}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleCreateSession}
+            data-testid="create-session-button" // Ajout de data-testid
+          >
             Créer la session
           </Button>
         </Box>
       </Modal>
 
-      {/* Snackbar pour les messages */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
