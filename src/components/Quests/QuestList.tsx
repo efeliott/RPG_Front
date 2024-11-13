@@ -1,5 +1,3 @@
-// src/components/Quests/QuestList.tsx
-
 import React, { useEffect, useState } from 'react';
 import {
   Table,
@@ -21,6 +19,7 @@ import {
 import axiosInstance from '../../api/axios';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import CheckIcon from '@mui/icons-material/Check';
 
 interface Quest {
   quest_id: number;
@@ -28,6 +27,7 @@ interface Quest {
   description: string;
   reward: number;
   is_finished: boolean;
+  character_id: number | null;
 }
 
 const QuestList: React.FC<{ sessionId: number }> = ({ sessionId }) => {
@@ -40,7 +40,6 @@ const QuestList: React.FC<{ sessionId: number }> = ({ sessionId }) => {
   const [editQuestId, setEditQuestId] = useState<number | null>(null);
   const [error, setError] = useState('');
 
-  // Fetches quests for the session on component mount
   useEffect(() => {
     const fetchQuests = async () => {
       try {
@@ -53,7 +52,14 @@ const QuestList: React.FC<{ sessionId: number }> = ({ sessionId }) => {
     fetchQuests();
   }, [sessionId]);
 
-  // Handles adding or updating a quest
+  const handleOpenDialog = () => {
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
   const handleAddOrUpdateQuest = async () => {
     setError('');
     if (!title || !description || reward === '') {
@@ -65,7 +71,7 @@ const QuestList: React.FC<{ sessionId: number }> = ({ sessionId }) => {
       const questData = {
         title,
         description,
-        reward: parseInt(reward, 10), // Convert to integer for consistency with backend
+        reward: parseInt(reward, 10),
         session_id: sessionId,
       };
 
@@ -75,7 +81,6 @@ const QuestList: React.FC<{ sessionId: number }> = ({ sessionId }) => {
         await axiosInstance.post(`/quests`, questData);
       }
 
-      // Clear form fields and close dialog
       setTitle('');
       setDescription('');
       setReward('');
@@ -83,7 +88,6 @@ const QuestList: React.FC<{ sessionId: number }> = ({ sessionId }) => {
       setEditQuestId(null);
       setDialogOpen(false);
 
-      // Refresh quest list after update
       const response = await axiosInstance.get(`/quests/${sessionId}/quests`);
       setQuests(response.data);
     } catch (err) {
@@ -92,7 +96,6 @@ const QuestList: React.FC<{ sessionId: number }> = ({ sessionId }) => {
     }
   };
 
-  // Opens dialog to edit a quest
   const handleEditQuest = (quest: Quest) => {
     setEditMode(true);
     setEditQuestId(quest.quest_id);
@@ -102,7 +105,6 @@ const QuestList: React.FC<{ sessionId: number }> = ({ sessionId }) => {
     setDialogOpen(true);
   };
 
-  // Deletes a quest and updates state
   const handleDeleteQuest = async (questId: number) => {
     try {
       await axiosInstance.delete(`/quests/${questId}`);
@@ -113,19 +115,26 @@ const QuestList: React.FC<{ sessionId: number }> = ({ sessionId }) => {
     }
   };
 
-  // Opens dialog for adding a new quest
-  const handleOpenDialog = () => {
-    setEditMode(false);
-    setEditQuestId(null);
-    setTitle('');
-    setDescription('');
-    setReward('');
-    setDialogOpen(true);
-  };
+  const handleMarkAsFinished = async (questId: number, reward: number, characterId: number | null) => {
+    if (!characterId) {
+      console.error("Aucun personnage associé à cette quête.");
+      return;
+    }
 
-  // Closes the dialog without saving changes
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
+    try {
+      await axiosInstance.post(`/quests/${questId}/complete`, {
+        reward,
+        character_id: characterId,
+      });
+
+      setQuests((prevQuests) =>
+        prevQuests.map((quest) =>
+          quest.quest_id === questId ? { ...quest, is_finished: true } : quest
+        )
+      );
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour de la quête:", error);
+    }
   };
 
   return (
@@ -136,7 +145,6 @@ const QuestList: React.FC<{ sessionId: number }> = ({ sessionId }) => {
       </Button>
       {error && <Typography color="error">{error}</Typography>}
 
-      {/* Dialog for adding or editing a quest */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth>
         <DialogTitle>{editMode ? 'Modifier la quête' : 'Ajouter une nouvelle quête'}</DialogTitle>
         <DialogContent>
@@ -200,6 +208,16 @@ const QuestList: React.FC<{ sessionId: number }> = ({ sessionId }) => {
                   <IconButton onClick={() => handleDeleteQuest(quest.quest_id)}>
                     <DeleteIcon />
                   </IconButton>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    startIcon={<CheckIcon />}
+                    onClick={() => handleMarkAsFinished(quest.quest_id, quest.reward, quest.character_id)}
+                    disabled={quest.is_finished || !quest.character_id}
+                    sx={{ ml: 1 }}
+                  >
+                    {quest.is_finished ? "Terminée" : "Marquer comme finie"}
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}

@@ -2,7 +2,6 @@ import React from 'react';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import HomeIcon from '@mui/icons-material/Home';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import { createTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -31,13 +30,8 @@ const DashboardLayoutBasic: React.FC = () => {
       icon: <HomeIcon />,
     },
     {
-      segment: 'orders',
-      title: 'Orders',
-      icon: <ShoppingCartIcon />,
-    },
-    {
-      segment: 'reports',
-      title: 'Reports',
+      segment: 'account',
+      title: 'Mon compte',
       icon: <BarChartIcon />,
       children: [
         {

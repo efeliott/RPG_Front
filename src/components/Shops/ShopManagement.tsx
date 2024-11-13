@@ -157,13 +157,13 @@ const ShopManagement: React.FC<{ sessionId: number }> = ({ sessionId }) => {
             onChange={(e) => setDescription(e.target.value)}
             required
           />
-          <TextField
+          {/* <TextField
             label="Image URL"
             fullWidth
             margin="normal"
             value={imgUrl}
             onChange={(e) => setImgUrl(e.target.value)}
-          />
+          /> */}
           <TextField
             label="Prix"
             fullWidth
@@ -189,7 +189,7 @@ const ShopManagement: React.FC<{ sessionId: number }> = ({ sessionId }) => {
             <TableRow>
               <TableCell>Titre</TableCell>
               <TableCell>Description</TableCell>
-              <TableCell>Image</TableCell>
+              {/* <TableCell>Image</TableCell> */}
               <TableCell align="right">Prix</TableCell>
               <TableCell align="center">Actions</TableCell>
             </TableRow>
@@ -199,11 +199,11 @@ const ShopManagement: React.FC<{ sessionId: number }> = ({ sessionId }) => {
               <TableRow key={shopItem.item_id}>
                 <TableCell>{shopItem.item.title}</TableCell>
                 <TableCell>{shopItem.item.description}</TableCell>
-                <TableCell>
+                {/* <TableCell>
                   {shopItem.item.img_url && (
                     <img src={shopItem.item.img_url} alt={shopItem.item.title} style={{ width: '50px' }} />
                   )}
-                </TableCell>
+                </TableCell> */}
                 <TableCell align="right">{shopItem.price}</TableCell>
                 <TableCell align="center">
                   <IconButton onClick={() => handleEdit(shopItem)}>

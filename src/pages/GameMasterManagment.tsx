@@ -1,3 +1,5 @@
+// src/components/pages/GameMasterManagement.tsx
+
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Typography, Tabs, Tab } from '@mui/material';
@@ -10,35 +12,29 @@ import QuestList from '../components/Quests/QuestList';
 import axiosInstance from '../api/axios';
 
 const GameMasterManagement: React.FC = () => {
-  const { sessionId } = useParams<{ sessionId: string }>();
-  const { user, token } = useAuth();
-  const [isGameMaster, setIsGameMaster] = useState(false);
+  const { sessionToken } = useParams<{ sessionToken: string }>();
+  const { token } = useAuth();
   const [sessionData, setSessionData] = useState<any>(null);
   const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
     const fetchSessionData = async () => {
       try {
-        const response = await axiosInstance.get(`/game-master/${sessionId}`, {
+        const response = await axiosInstance.get(`/game-master/${sessionToken}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setSessionData(response.data);
-        setIsGameMaster(response.data.game_master_id === user?.id);
       } catch (err) {
         console.error("Erreur lors de la récupération des données de la session:", err);
       }
     };
 
     fetchSessionData();
-  }, [sessionId, user, token]);
+  }, [sessionToken, token]);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
   };
-
-  if (!isGameMaster) {
-    return <Typography>Vous n'êtes pas autorisé à accéder à cette page.</Typography>;
-  }
 
   return (
     <Box sx={{ padding: 3 }}>
@@ -47,18 +43,18 @@ const GameMasterManagement: React.FC = () => {
       </Typography>
       <Tabs value={tabValue} onChange={handleTabChange} aria-label="Gestion Game Master">
         <Tab label="Personnages" />
-        <Tab label="Wallets" />
+        <Tab label="Porte-monnaie" />
         <Tab label="Inventaire" />
-        <Tab label="Shop" />
+        <Tab label="Magasin" />
         <Tab label="Quêtes" />
       </Tabs>
 
       <Box sx={{ marginTop: 3 }}>
-        {tabValue === 0 && <CharacterList sessionId={Number(sessionId)} />}
-        {tabValue === 1 && <WalletManagement sessionId={Number(sessionId)} />}
-        {tabValue === 2 && <InventoryList sessionId={Number(sessionId)} />}
-        {tabValue === 3 && <ShopManagement sessionId={Number(sessionId)} />}
-        {tabValue === 4 && <QuestList sessionId={Number(sessionId)} />}
+        {tabValue === 0 && <CharacterList sessionId={sessionData?.session_id} />}
+        {tabValue === 1 && <WalletManagement sessionId={sessionData?.session_id} />}
+        {tabValue === 2 && <InventoryList sessionId={sessionData?.session_id} />}
+        {tabValue === 3 && <ShopManagement sessionId={sessionData?.session_id} />}
+        {tabValue === 4 && <QuestList sessionId={sessionData?.session_id} />}
       </Box>
     </Box>
   );
